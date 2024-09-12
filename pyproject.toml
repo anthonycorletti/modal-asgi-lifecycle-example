@@ -80,14 +80,13 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=xml",
     "--cov-report=html",
-    # "--cov-fail-under=100", TODO!
 ]
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 parallel = true
 source = ["app", "tests"]
-omit = ["*__init__.py"]
+omit = ["*__init__.py", "app/_modal.py"]
 concurrency = ["thread", "greenlet", "multiprocessing"]
 
 [tool.coverage.report]
