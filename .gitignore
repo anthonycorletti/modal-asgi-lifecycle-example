@@ -141,6 +141,7 @@ dmypy.json
 cython_debug/
 
 *.lock
+!uv.lock
 
 tmp/
 
