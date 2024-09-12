@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    env:
+      APP_ENV: test
+
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+
+      - name: set up python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: create test venv
+        run: uv venv
+
+      - name: install
+        run: bin/install-ci
+
+      - name: lint
+        run: bin/check
+
+      - name: run postgres container
+        run: |
+          docker run --rm -d --name app-pg-test \
+          -p 5432:5432 \
+          -e POSTGRES_PASSWORD=postgres \
+          -e POSTGRES_USER=postgres \
+          -e POSTGRES_DB=app_test \
+          postgres:16.4
+
+      - name: run migrations
+        run: bin/db-migrate
+
+      - name: test
+        run: bin/test
